@@ -1,0 +1,256 @@
+# =============================================================================
+# The entries that actually matter for THIS repo are at the top. Everything
+# below is conventional coverage.
+# =============================================================================
+
+# --- Secrets -----------------------------------------------------------------
+# This project has no .env by design: all live values are Terraform outputs, read
+# on demand via `terraform output`, so there is no static file to leak or to go
+# stale. These patterns stay as a guard in case anyone adds one.
+#
+# The negations must come AFTER the patterns that catch them, and they keep
+# templates like terraform.tfvars.example committed.
+.env
+.env.*
+*.env
+!*.example
+!*.example.*
+
+# Holds the SP secret when testing locally - never commit this.
+function/local.settings.json
+
+# Generic credential files.
+secrets.*
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+*_rsa
+*_ed25519
+.netrc
+.pgpass
+.htpasswd
+
+# --- Terraform ---------------------------------------------------------------
+# State contains live secrets in plaintext: the storage account access key, the
+# Function host key, and the APIM subscription key.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl.bak
+crash.log
+crash.*.log
+
+# Saved plans embed a full copy of state, so they leak the same credentials.
+# Verified: 7 of the 9 plan files in this repo contained the live storage key.
+# Delete them once applied rather than keeping them around.
+*.tfplan
+*.tfplan.*
+*.plan
+
+# Variable files carry real values (SSH public keys, source CIDRs, client ids).
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+!terraform.tfvars.example
+!*.tfvars.example
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.tfstate.lock.info
+
+# --- Python / Azure Functions ------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtualenvs
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.python-version
+
+# Test / coverage / type-check caches
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+.cache
+nosetests.xml
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Azure Functions Core Tools
+bin/
+obj/
+appsettings.json
+local.settings.json
+.python_packages/
+.funcignore.bak
+
+# --- Node -------------------------------------------------------------------
+node_modules/
+jspm_packages/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.node_repl_history
+*.tsbuildinfo
+.eslintcache
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+
+# --- Editors / IDEs ----------------------------------------------------------
+.vscode/
+!.vscode/settings.json.example
+!.vscode/extensions.json
+.idea/
+*.iml
+*.ipr
+*.iws
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*.swn
+*~
+.\#*
+\#*\#
+.vim/
+.netrwhist
+tags
+TAGS
+.tern-project
+
+# --- OS ---------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.AppleDouble
+.LSOverride
+Icon?
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+.directory
+.Trash-*
+.nfs*
+
+# --- Logs / temp -------------------------------------------------------------
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+tmp/
+temp/
+.tmp/
+
+# --- Archives (rarely belong in git; often hold exported secrets) ------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+
+# --- Jupyter -----------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+profile_default/
+ipython_config.py
+
+# --- Databricks --------------------------------------------------------------
+.databricks/
+.databrickscfg
+databricks.yml.bak
+.dbx/
+
+# --- Azure CLI / cloud tooling ----------------------------------------------
+.azure/
+.azcopy/
+*.publishsettings
+*.azurePubxml
+*.pubxml
+*.pubxml.user
+
+# --- Misc --------------------------------------------------------------------
+.direnv/
+.envrc
+.tool-versions
+.history/
+*.pid
+*.seed
+*.pid.lock
+.sonarwork/

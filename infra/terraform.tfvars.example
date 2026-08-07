@@ -1,0 +1,71 @@
+# Copy to terraform.tfvars and adjust. All values below are placeholders.
+
+# Required - no default.
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
+location = "eastus2"
+
+# 3-14 chars, lowercase alphanumeric and hyphens. Used to name every resource,
+# so keep it short - APIM and storage names have tight length limits.
+prefix = "dbx-pl"
+
+# Owner + RemoveAfter tags on the resource group. Some Azure environments delete
+# untagged or undated resource groups automatically, so set these to your own
+# address and a sensible cleanup date.
+owner        = "you@example.com"
+remove_after = "2099-12-31"
+
+apim_publisher_email = "you@example.com"
+
+# Developer_1 (~$50/mo) is right for this test. Premium_1 is ~$2800/mo.
+apim_sku = "Developer_1"
+
+# Inbound test: External gives APIM a PUBLIC gateway so an internet caller can
+# reach it (internet -> APIM -> private Function -> FMAPI). Use "Internal" for
+# the egress variant (private Databricks -> APIM -> internet).
+apim_virtual_network_type = "External"
+
+# Who may reach the public APIM gateway. REQUIRED for the inbound test - in
+# External mode with this empty, the gateway has a public IP but the NSG lets
+# nobody in. Set it to your caller's public IP as a /32 (find it with
+# `curl -s https://api.ipify.org`). Validation rejects 0.0.0.0/0; internet-wide
+# exposure should be a deliberate decision, not a default.
+apim_ingress_cidrs = ["203.0.113.10/32"]
+
+vnet_cidr = "10.180.0.0/16"
+
+# Legacy narrow-ingress list for the Internal-mode admin path. Leave empty for
+# the inbound (External) test; apim_ingress_cidrs is what gates public access.
+allowed_admin_cidrs = []
+
+# browser_authentication is limited to one per region per PRIVATE DNS ZONE, not
+# per tenant. This stack owns its own zone, so it does not collide with other
+# engineers. Set false only if you do not need browser SSO.
+create_browser_auth_endpoint = true
+
+# --- Jumpbox ---
+# Required to reach anything here: the workspace, Key Vault, and Function all
+# have public access disabled. ~$7.59/mo for B1s vs ~$139/mo for Bastion Basic.
+create_jumpbox         = false
+jumpbox_vm_size        = "Standard_B1s"
+jumpbox_admin_username = "azureuser"
+# jumpbox_ssh_public_key = file("~/.ssh/id_ed25519.pub")
+# Your public IP as a /32 (203.0.113.10 is a documentation placeholder).
+# Internet-wide input is rejected by validation.
+# jumpbox_ssh_source_cidrs = ["203.0.113.10/32"]
+
+# --- Function / FMAPI ---
+# EP1 ~$150/mo. Flex is cheaper but has known VNet + private endpoint issues.
+function_plan_sku = "EP1"
+
+# MUST exist in YOUR workspace - a fresh workspace has zero serving endpoints
+# until it is enabled for Foundation Model APIs. Verify under Serving before
+# applying: an endpoint can list as READY and still return RESOURCE_DOES_NOT_EXIST.
+fmapi_endpoint_name = "databricks-claude-sonnet-4"
+
+# Databricks SP application ID from the Databricks-side prep. Not a secret.
+databricks_sp_client_id = "00000000-0000-0000-0000-000000000000"
+
+# Key Vault secret NAME only. The secret value is set out-of-band via
+# seed-sp-secret.sh from the jumpbox - never in Terraform.
+databricks_sp_secret_name = "databricks-sp-oauth-secret"

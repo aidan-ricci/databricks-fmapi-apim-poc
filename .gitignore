@@ -245,6 +245,10 @@ databricks.yml.bak
 *.pubxml
 *.pubxml.user
 
+# --- Local tooling / agent state (not part of the deliverable) --------------
+.isaac/
+.claude/
+
 # --- Misc --------------------------------------------------------------------
 .direnv/
 .envrc
